@@ -22,7 +22,7 @@
 
     <groupId>org.encos</groupId>
     <artifactId>flydown</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
 
     <dependencies>
 
