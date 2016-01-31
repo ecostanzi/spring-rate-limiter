@@ -18,15 +18,12 @@ package org.encos.flydown;
 
 import org.encos.flydown.annotations.ExceptionRate;
 import org.encos.flydown.annotations.RequestRate;
-import org.encos.flydown.conf.FlydownProperties;
+import org.encos.flydown.limiters.params.FlydownDevil;
 import org.encos.flydown.limiters.params.FlydownEvent;
-import org.encos.flydown.limiters.params.FlydownIdentifier;
-
-import java.util.Properties;
 
 public class RateLimitData {
 
-    private FlydownIdentifier flydownIdentifier;
+    private FlydownDevil flydownDevil;
     private FlydownEvent flydownEvent;
 
     private int max;
@@ -39,12 +36,12 @@ public class RateLimitData {
     private String suspensionKeyPrefix;
     private String rateEvaluationKeyPrefix;
 
-    private RateLimitData(FlydownIdentifier flydownIdentifier, FlydownEvent flydownEvent) {
-        this.flydownIdentifier = flydownIdentifier;
+    private RateLimitData(FlydownDevil flydownDevil, FlydownEvent flydownEvent) {
+        this.flydownDevil = flydownDevil;
         this.flydownEvent = flydownEvent;
 
-        rateEvaluationKeyPrefix = flydownEvent.name() + "_" + flydownIdentifier.name();
-        suspensionKeyPrefix = flydownIdentifier.name();
+        rateEvaluationKeyPrefix = flydownEvent.name() + "_" + flydownDevil.name();
+        suspensionKeyPrefix = flydownDevil.name();
     }
 
     public static RateLimitData build(ExceptionRate exceptionRate) {
@@ -53,7 +50,7 @@ public class RateLimitData {
                 FlydownEvent.EXCEPTION,
 
                 exceptionRate.max(),
-                exceptionRate.range(),
+                exceptionRate.interval(),
                 exceptionRate.suspendFor(),
 
                 exceptionRate.paramIndex(),
@@ -67,7 +64,7 @@ public class RateLimitData {
                 FlydownEvent.REQUEST,
 
                 requestRate.max(),
-                requestRate.range(),
+                requestRate.interval(),
                 requestRate.suspendFor(),
 
                 requestRate.paramIndex(),
@@ -76,7 +73,7 @@ public class RateLimitData {
     }
 
 
-    private static RateLimitData build(FlydownIdentifier blocking, FlydownEvent flydownEvent,
+    private static RateLimitData build(FlydownDevil blocking, FlydownEvent flydownEvent,
                                        int max, long range,
                                        long suspendFor, int paramIndex, String contextKey) {
 
@@ -84,31 +81,27 @@ public class RateLimitData {
 
         RateLimitData rateLimitData = new RateLimitData(blocking, flydownEvent);
 
-        rateLimitData.setMax(max > 0 ? max : FlydownProperties.MAX_REQUESTS_DEFAULT);
-        rateLimitData.setRange(range > 0 ? range : FlydownProperties.TIME_RANGE_DEFAULT);
-        rateLimitData.setSuspension(suspendFor > 0 ? suspendFor : FlydownProperties.SUSPENSION_TIME_DEFAULT);
+        rateLimitData.setMax(max);
+        rateLimitData.setRange(range);
+        rateLimitData.setSuspension(suspendFor);
 
-        if (blocking == FlydownIdentifier.PARAM) {
+        if (blocking == FlydownDevil.PARAM) {
             rateLimitData.setParamIndex(paramIndex);
         }
 
-        if (blocking == FlydownIdentifier.CONTEXT_VAR) {
+        if (blocking == FlydownDevil.CONTEXT_VAR) {
             rateLimitData.setContextKey(contextKey);
         }
 
         return rateLimitData;
     }
 
-    static void setProperties(Properties properties) {
-        properties.putAll(properties);
+    public FlydownDevil getFlydownDevil() {
+        return flydownDevil;
     }
 
-    public FlydownIdentifier getFlydownIdentifier() {
-        return flydownIdentifier;
-    }
-
-    public void setFlydownIdentifier(FlydownIdentifier flydownIdentifier) {
-        this.flydownIdentifier = flydownIdentifier;
+    public void setFlydownDevil(FlydownDevil flydownDevil) {
+        this.flydownDevil = flydownDevil;
     }
 
     public FlydownEvent getFlydownEvent() {

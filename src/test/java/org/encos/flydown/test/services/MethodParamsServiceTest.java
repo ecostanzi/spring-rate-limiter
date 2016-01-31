@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.encos.flydown.exceptions;
+package org.encos.flydown.test.services;
+
+import org.encos.flydown.annotations.RequestRate;
+import org.encos.flydown.limiters.params.FlydownDevil;
 
 /**
  * @author Enrico Costanzi
  */
-public class FlydownRuntimeException extends RuntimeException {
+public class MethodParamsServiceTest {
 
-    public FlydownRuntimeException(String message) {
-        super(message);
+    @RequestRate(value = FlydownDevil.PARAM, paramIndex = 0)
+    public void checkParam(String myParameter) {
+
     }
-
 }

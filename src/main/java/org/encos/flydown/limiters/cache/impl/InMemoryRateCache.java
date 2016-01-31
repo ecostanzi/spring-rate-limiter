@@ -16,7 +16,7 @@
 
 package org.encos.flydown.limiters.cache.impl;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.exceptions.RateExceededException;
 import org.encos.flydown.limiters.cache.AbstractRateCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +32,12 @@ public class InMemoryRateCache extends AbstractRateCache {
 
     private Map<String, Object> cacheTemplate = new HashMap<String, Object>();
 
-    public boolean isSuspended(String suspensionKey) throws RateException {
+    public boolean isSuspended(String suspensionKey) throws RateExceededException {
         Object o = cacheTemplate.get(suspensionKey);
         return o != null && new Date((Long) o).after(new Date());
     }
 
-    public long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateException {
+    public long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateExceededException {
         ArrayList<Long> currentList = (ArrayList<Long>) cacheTemplate.get(evaluationKey);
         if (currentList == null) {
             currentList = new ArrayList<Long>();

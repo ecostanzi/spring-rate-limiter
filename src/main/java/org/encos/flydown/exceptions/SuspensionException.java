@@ -14,31 +14,16 @@
  * limitations under the License.
  */
 
-package org.encos.flydown.test;
-
-import org.encos.flydown.annotations.RequestRate;
-import org.encos.flydown.limiters.params.FlydownIdentifier;
+package org.encos.flydown.exceptions;
 
 /**
+ *
  * @author Enrico Costanzi
  */
-public class ContextServiceTest {
+public class SuspensionException extends FlydownRuntimeException {
 
-    public static final String DUMMY_IP_CONTEXT = "IP";
-    public static final String DUMMY_OTHER_CONTEXT = "other_context";
-
-    @RequestRate(value = FlydownIdentifier.CONTEXT_VAR, contextKey = DUMMY_IP_CONTEXT)
-    public void ipContext() {
-
+    public SuspensionException(String message) {
+        super(message);
     }
 
-    @RequestRate(value = FlydownIdentifier.PRINCIPAL)
-    public void getPrincipal() {
-
-    }
-
-    @RequestRate(value = FlydownIdentifier.PARAM, paramIndex = 0)
-    public void checkParam(String myParameter) {
-
-    }
 }

@@ -16,12 +16,15 @@
 
 package org.encos.flydown;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.conf.FlydownProperties;
+import org.encos.flydown.exceptions.RateExceededException;
+import org.encos.flydown.exceptions.SuspensionException;
 import org.encos.flydown.limiters.cache.AbstractRateCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 
@@ -30,17 +33,19 @@ class FlydownRateLimiter {
     private final static Logger log = LoggerFactory.getLogger(FlydownRateLimiter.class);
 
     AbstractRateCache rateCache;
+    Properties flydownProperties;
 
-    FlydownRateLimiter(AbstractRateCache rateCache) {
+    FlydownRateLimiter(AbstractRateCache rateCache, Properties properties) {
         this.rateCache = rateCache;
+        this.flydownProperties = properties;
     }
 
-    public void checkSuspension(RateLimitData rateLimitData, String methodId, String id) throws RateException {
+    public void checkSuspension(RateLimitData rateLimitData, String methodId, String id) throws RateExceededException {
         String suspensionKey = suspensionKey(rateLimitData, methodId, id);
         log.debug("checking suspension for key {}", suspensionKey);
         try {
             rateCache.isSuspended(suspensionKey);
-        } catch (RateException e) {
+        } catch (RateExceededException e) {
             log.info("suspending request mapped on key {}", suspensionKey);
             throw e;
         } catch (Exception e) {
@@ -49,7 +54,7 @@ class FlydownRateLimiter {
     }
 
 
-    public long cacheRequest(RateLimitData rateLimitData, String methodId, String id) throws RateException {
+    public long cacheRequest(RateLimitData rateLimitData, String methodId, String id) throws RateExceededException {
         String evaluationKey = evaluationKey(rateLimitData, methodId, id);
         String suspensionKey = suspensionKey(rateLimitData, methodId, id);
 
@@ -60,23 +65,36 @@ class FlydownRateLimiter {
     }
 
     private long cacheRequest(String suspensionKey, String evaluationKey, int maxCount,
-                              long timeRange, long suspensionTime) throws RateException {
+                              long interval, long suspensionTime) throws RateExceededException {
 
-        long cacheTime = TimeUnit.MILLISECONDS.toMillis(timeRange);
+        int localMaxCount = maxCount >=0 ?
+                maxCount :
+                Integer.parseInt(flydownProperties.getProperty(FlydownProperties.FLYDOWN_REQUESTS_LIMIT));
+
+        long localInterval = interval > 0 ? interval :
+                Integer.parseInt(flydownProperties.getProperty(FlydownProperties.FLYDOWN_INTERVAL_TIME));
+
+        long localSuspensionTime = suspensionTime > 0 ? suspensionTime :
+                Integer.parseInt(flydownProperties.getProperty(FlydownProperties.FLYDOWN_SUSPENSION_TIME));
+
+        long cacheTime = TimeUnit.MILLISECONDS.toMillis(localInterval);
 
         try {
             rateCache.isSuspended(suspensionKey);
-            rateCache.cacheRequest(evaluationKey, timeRange, TimeUnit.MILLISECONDS);
+            rateCache.cacheRequest(evaluationKey, localInterval, TimeUnit.MILLISECONDS);
 
-            if (rateCache.checkTooManyEntries(evaluationKey, maxCount, timeRange, TimeUnit.MILLISECONDS)) {
-                rateCache.suspend(suspensionKey, suspensionTime, TimeUnit.MILLISECONDS);
-                rateCache.delete(evaluationKey);
-                throw new RateException("Request rate too high, retry later...");
+            if (rateCache.checkTooManyEntries(evaluationKey, localMaxCount, localInterval, TimeUnit.MILLISECONDS)) {
+                if(localSuspensionTime > 0){
+                    rateCache.suspend(suspensionKey, localSuspensionTime, TimeUnit.MILLISECONDS);
+                    rateCache.delete(evaluationKey);
+//                    throw new SuspensionException(evaluationKey);
+                }
+                throw new RateExceededException(evaluationKey);
             } else {
                 log.debug("key {} not yet expired", suspensionKey);
             }
 
-        } catch (RateException e) {
+        } catch (RateExceededException e) {
             throw e;
         } catch(Exception e){
             log.warn("Cache failed", e);
@@ -87,13 +105,13 @@ class FlydownRateLimiter {
 
     private String suspensionKey(RateLimitData rateLimitData, String methodId, String id) {
         return MessageFormat.format("{0}:{1}={2}",
-                methodId, rateLimitData.getFlydownIdentifier().name(), id);
+                methodId, rateLimitData.getFlydownDevil().name(), id);
     }
 
     private String evaluationKey(RateLimitData rateLimitData, String methodId, String id) {
         return MessageFormat.format("{0}_{1}:{2}={3}",
                 rateLimitData.getFlydownEvent(), methodId,
-                rateLimitData.getFlydownIdentifier().name(), id);
+                rateLimitData.getFlydownDevil().name(), id);
     }
 
 }

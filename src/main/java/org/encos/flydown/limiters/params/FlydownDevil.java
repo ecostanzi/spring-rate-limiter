@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package org.encos.flydown.exceptions;
+package org.encos.flydown.limiters.params;
 
-/**
- * @author Enrico Costanzi
- */
-public class FlydownRuntimeException extends RuntimeException {
-
-    public FlydownRuntimeException(String message) {
-        super(message);
-    }
-
+public enum FlydownDevil {
+    PRINCIPAL, PARAM, CONTEXT_VAR
 }

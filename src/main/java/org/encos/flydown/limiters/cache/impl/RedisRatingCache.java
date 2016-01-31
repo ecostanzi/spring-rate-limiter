@@ -16,7 +16,7 @@
 
 package org.encos.flydown.limiters.cache.impl;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.exceptions.RateExceededException;
 import org.encos.flydown.limiters.cache.AbstractRateCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class RedisRatingCache extends AbstractRateCache {
         cacheTemplate.setConnectionFactory(jedisConnectionFactory);
     }
 
-    public boolean isSuspended(String suspensionKey) throws RateException {
+    public boolean isSuspended(String suspensionKey) throws RateExceededException {
         Object suspensionValue = cacheTemplate.opsForValue().get(suspensionKey);
         if (suspensionValue != null) {
             Long expire = cacheTemplate.getExpire(suspensionKey);

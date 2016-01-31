@@ -16,15 +16,19 @@
 
 package org.encos.flydown.test;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.exceptions.RateExceededException;
+import org.encos.flydown.exceptions.SuspensionException;
 import org.encos.flydown.limiters.cache.impl.InMemoryRateCache;
+import org.encos.flydown.test.services.ContextServiceTest;
+import org.encos.flydown.test.services.MethodParamsServiceTest;
+import org.encos.flydown.test.services.PrincipalServiceTest;
 import org.encos.flydown.test.utils.security.DefaultAuthentication;
 import org.encos.flydown.test.utils.security.DefaultPrincipal;
 import org.encos.flydown.test.utils.security.DefaultSecurityContext;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,44 +42,51 @@ import static org.junit.Assert.assertNotEquals;
 @ContextConfiguration("classpath:test-application.xml")
 public class ContextTest {
 
-    private static Integer maxRequests;
+    private static final int DEFAULT_TIMEOUT = 10000;
+
+    @Value("${test.flydown.requests.limit}")
+    Integer requestLimit;
+
     @Autowired
     InMemoryRateCache memoryRateCache;
+
     @Autowired
-    ContextServiceTest ratedClass;
+    ContextServiceTest contextService;
 
-    @BeforeClass
-    public static void initTests() {
-        maxRequests = 11;//fixme all this stuff has to be fixed using properties and final variables
-    }
+    @Autowired
+    MethodParamsServiceTest paramsService;
 
-    @Test(expected = RateException.class)
+
+    @Autowired
+    PrincipalServiceTest principalService;
+
+    @Test(expected = RateExceededException.class, timeout = DEFAULT_TIMEOUT)
     public void testContext() throws Exception {
         memoryRateCache.addToContext(ContextServiceTest.DUMMY_IP_CONTEXT, "127.0.0.1");
-        for (int i = 0; i < maxRequests; i++) {
-            ratedClass.ipContext();
-            assertNotEquals(i, maxRequests + 1);
+        for (int i = 0; i < requestLimit + 1; i++) {
+            contextService.ipContext();
+            assertNotEquals(i, requestLimit + 1);
         }
     }
 
-    @Test(expected = RateException.class)
+    @Test(expected = RateExceededException.class, timeout = DEFAULT_TIMEOUT)
+    public void testParam() throws Exception {
+        for (int i = 0; i < requestLimit + 1; i++) {
+            paramsService.checkParam("myFakeTestParam");
+            assertNotEquals(i, requestLimit + 1);
+        }
+    }
+
+    @Test(expected = RateExceededException.class, timeout = DEFAULT_TIMEOUT)
     public void testPrincipal() throws Exception {
         DefaultSecurityContext securityContext =
                 new DefaultSecurityContext(new DefaultAuthentication(new DefaultPrincipal("enrico")));
         SecurityContextHolder.setContext(securityContext);
 
-        for (int i = 0; i < maxRequests; i++) {
-            ratedClass.getPrincipal();
-            assertNotEquals(i, maxRequests + 1);
+        for (int i = 0; i < requestLimit + 1; i++) {
+            principalService.principalDoSomething();
+            assertNotEquals(i, requestLimit + 1);
 
-        }
-    }
-
-    @Test(expected = RateException.class)
-    public void testParam() throws Exception {
-        for (int i = 0; i < maxRequests; i++) {
-            ratedClass.checkParam("myFakeTestParam");
-            assertNotEquals(i, maxRequests + 1);
         }
     }
 }

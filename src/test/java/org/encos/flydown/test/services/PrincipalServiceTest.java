@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package org.encos.flydown.exceptions;
+package org.encos.flydown.test.services;
+
+import org.encos.flydown.annotations.RequestRate;
+import org.encos.flydown.limiters.params.FlydownDevil;
 
 /**
- *
  * @author Enrico Costanzi
  */
-public class RateException extends RuntimeException {
+public class PrincipalServiceTest {
 
-    public RateException(String message) {
-        super(message);
+    public static final String DUMMY_IP_CONTEXT = "IP";
+    public static final String DUMMY_OTHER_CONTEXT = "other_context";
+
+    @RequestRate(value = FlydownDevil.PRINCIPAL)
+    public void principalDoSomething() {
+
     }
 
 }

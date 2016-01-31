@@ -16,7 +16,7 @@
 
 package org.encos.flydown.annotations;
 
-import org.encos.flydown.limiters.params.FlydownIdentifier;
+import org.encos.flydown.limiters.params.FlydownDevil;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,17 +28,46 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ExceptionRate {
 
-    FlydownIdentifier value();
+    /**
+     * The devil to be locked
+     * @return
+     */
+    FlydownDevil value();
 
-    int max() default 10;
+    /**
+     * The maximum number of requests allowed in the interval
+     * @return
+     */
+    int max() default -1;
 
-    long range() default 10 * 1000;
+    /**
+     * The interval (in milliseconds) in which to consider the requests
+     * @return
+     */
+    long interval() default -1;
 
-    long suspendFor() default 2 * 60 * 1000;
+    /**
+     * The suspension time (in milliseconds) to be set for the devil that perform
+     * too many requests. Suspends only if the value is positive.
+     * @return
+     */
+    long suspendFor() default 0;
 
+    /**
+     * The method parameter index to consider for rating
+     * @return
+     */
     int paramIndex() default -1;
 
+    /**
+     * The context key to consider for rating
+     * @return
+     */
     String contextKey() default "";
 
+    /**
+     * The list of exception class considered for rating
+     * @return
+     */
     Class<? extends Throwable>[] exceptions();
 }

@@ -17,11 +17,12 @@
 package org.encos.flydown.exceptions;
 
 /**
+ *
  * @author Enrico Costanzi
  */
-public class FlydownRuntimeException extends RuntimeException {
+public class RateExceededException extends FlydownRuntimeException {
 
-    public FlydownRuntimeException(String message) {
+    public RateExceededException(String message) {
         super(message);
     }
 

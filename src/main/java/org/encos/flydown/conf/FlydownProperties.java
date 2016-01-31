@@ -23,24 +23,19 @@ import java.util.Properties;
  */
 public class FlydownProperties extends Properties {
 
-    public final static String FLYDOWN_PRINCIPAL_ID = "flydown.principal.id";
+    public static final String FLYDOWN_REQUESTS_LIMIT = "flydown.requests.limit";
+    public final static Integer REQUEST_LIMIT_DEFAULT = 10;
 
-    //    public static final String FLYDOWN_REQUESTS_LIMIT = "flydown.requests.limit";
-    public final static Integer MAX_REQUESTS_DEFAULT = 10;
+    public static final String FLYDOWN_INTERVAL_TIME = "flydown.interval.time";
+    public final static Integer INTERVAL_DEFAULT = 10 * 1000;
 
-    //    public static final String FLYDOWN_RANGE_TIME = "flydown.range.time";
-    public final static Integer TIME_RANGE_DEFAULT = 10 * 1000;
-
-    //    public static final String FLYDOWN_SUSPENSION_TIME = "flydown.suspension.time";
-    public final static Integer SUSPENSION_TIME_DEFAULT = 60 * 2 * 1000;
-
-//    private static final String FLYDOWN_PARAM_INDEX = "flydown.param.index";
-//    private static final String FLYDOWN_CONTEXT_KEY= "flydown.context.key";
+    public static final String FLYDOWN_SUSPENSION_TIME = "flydown.suspension.time";
+    public final static Integer SUSPENSION_TIME_DEFAULT = 0;
 
     public FlydownProperties() {
-//        setProperty(FLYDOWN_REQUESTS_LIMIT, String.valueOf(MAX_REQUESTS_DEFAULT));
-//        setProperty(FLYDOWN_RANGE_TIME,String.valueOf(TIME_RANGE_DEFAULT));
-//        setProperty(FLYDOWN_SUSPENSION_TIME, String.valueOf(SUSPENSION_TIME_DEFAULT));
+        setProperty(FLYDOWN_REQUESTS_LIMIT, String.valueOf(REQUEST_LIMIT_DEFAULT));
+        setProperty(FLYDOWN_INTERVAL_TIME,String.valueOf(INTERVAL_DEFAULT));
+        setProperty(FLYDOWN_SUSPENSION_TIME, String.valueOf(SUSPENSION_TIME_DEFAULT));
     }
 
 }

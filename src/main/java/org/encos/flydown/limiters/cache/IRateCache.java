@@ -16,7 +16,7 @@
 
 package org.encos.flydown.limiters.cache;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.exceptions.RateExceededException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
  */
 interface IRateCache {
 
-    boolean isSuspended(String suspensionKey) throws RateException;
+    boolean isSuspended(String suspensionKey) throws RateExceededException;
 
-    long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateException;
+    long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateExceededException;
 
     long suspend(String suspensionKey, long suspensionTime, TimeUnit suspensionTimeUnit);
 

@@ -16,7 +16,7 @@
 
 package org.encos.flydown.limiters.cache.impl;
 
-import org.encos.flydown.exceptions.RateException;
+import org.encos.flydown.exceptions.RateExceededException;
 import org.encos.flydown.limiters.cache.AbstractRateCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +32,11 @@ public class GuavaRateCache extends AbstractRateCache {
         //todo
     }
 
-    public boolean isSuspended(String suspensionKey) throws RateException {
+    public boolean isSuspended(String suspensionKey) throws RateExceededException {
         return false;
     }
 
-    public long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateException {
+    public long cacheRequest(String evaluationKey, long timeRange, TimeUnit timeRangeUnit) throws RateExceededException {
         return 0;
     }
 

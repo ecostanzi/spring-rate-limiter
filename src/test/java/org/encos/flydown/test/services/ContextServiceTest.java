@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package org.encos.flydown.limiters.params;
+package org.encos.flydown.test.services;
 
-public enum FlydownIdentifier {
-    PRINCIPAL, PARAM, CONTEXT_VAR
+import org.encos.flydown.annotations.RequestRate;
+import org.encos.flydown.limiters.params.FlydownDevil;
+
+/**
+ * @author Enrico Costanzi
+ */
+public class ContextServiceTest {
+
+    public static final String DUMMY_IP_CONTEXT = "IP";
+    public static final String DUMMY_OTHER_CONTEXT = "other_context";
+
+    @RequestRate(value = FlydownDevil.CONTEXT_VAR, contextKey = DUMMY_IP_CONTEXT)
+    public void ipContext() {
+
+    }
+
 }
