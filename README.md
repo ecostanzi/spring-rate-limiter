@@ -59,6 +59,45 @@ public void doSomething(HttpRequest request) {
 }
 ```
 
+#### Rating Exception
+Requests might not be the only thing you want to limit. A malicious behaviour can be detected and announced also by a java exception. 
+
+```
+@ExceptionRate(value = FlydownIdentifier.PRINCIPAL,
+        max = 1, range = 60000,
+        suspendFor = 36000, exception=BadLanguageException.class)
+public void commentPost(int postId, String comment) {
+  // the principal does something
+}
+```
+
+#### Default values
+
+You might also want to set default values for most of your Request/Exception Rate, this can be done through the flydown properties:
+
+```
+<bean class="org.encos.flydown.Flydown">
+    <property name="rateCache" ref="memoryRateCache"/>
+    <property name="flydownProperties">
+        <props>
+            <prop key="flydown.requests.limit">10</prop>
+            <prop key="flydown.interval.time">10000</prop>
+            <prop key="flydown.suspension.time">36000</prop>
+        </props>
+    </property>
+</bean>
+```
+
+So that your annotations become more readable:
+
+```
+@RequestRate(value = FlydownIdentifier.PRINCIPAL)
+public void commentPost(int postId, String comment) {
+  // the principal does something
+}
+    
+    
+```
 
 
 ### Available Caches
