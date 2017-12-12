@@ -1,7 +1,7 @@
 Flydown
 ===
 
-[![Build Status](https://travis-ci.org/encos/flydown.svg?branch=master)](https://travis-ci.org/encos/flydown)
+[![Build Status](https://travis-ci.org/encos/spring-rate-limiter.svg?branch=master)](https://travis-ci.org/encos/flydown)
 
 
 **A Spring rate limiter**
