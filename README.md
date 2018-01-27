@@ -1,4 +1,4 @@
-Flydown
+Spring Rate Limiter
 ===
 
 [![Build Status](https://travis-ci.org/encos/spring-rate-limiter.svg?branch=master)](https://travis-ci.org/encos/flydown)
